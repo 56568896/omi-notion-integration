@@ -13,10 +13,10 @@ async function initializeMCP() {
     
     const transport = new StdioClientTransport({
       command: 'npx',
-      args: ['-y', '@modelcontextprotocol/server-notion'],
+      args: ['-y', '@makenotion/notion-mcp-server'],
       env: {
         ...process.env,
-        NOTION_API_KEY: process.env.NOTION_API_KEY
+        NOTION_TOKEN: process.env.NOTION_API_KEY
       }
     });
     
