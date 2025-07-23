@@ -1,6 +1,5 @@
 // Vercel serverless function for Omi AI → Notion integration
-const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
-const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+// Note: Using dynamic imports for ES modules
 
 let mcpClient = null;
 
@@ -8,6 +7,10 @@ async function initializeMCP() {
   if (mcpClient) return mcpClient;
   
   try {
+    // Dynamic import for ES modules
+    const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
+    const { StdioClientTransport } = await import('@modelcontextprotocol/sdk/client/stdio.js');
+    
     const transport = new StdioClientTransport({
       command: 'npx',
       args: ['-y', '@makenotion/notion-mcp-server'],
