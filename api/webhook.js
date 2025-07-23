@@ -1,43 +1,14 @@
 // Vercel serverless function for Omi AI → Notion integration
-// Note: Using dynamic imports for ES modules
+// Using Notion API directly instead of MCP
 
-let mcpClient = null;
+const { Client } = require('@notionhq/client');
 
-async function initializeMCP() {
-  if (mcpClient) return mcpClient;
-  
-  try {
-    // Dynamic import for ES modules
-    const { Client } = await import('@modelcontextprotocol/sdk/client/index.js');
-    const { StdioClientTransport } = await import('@modelcontextprotocol/sdk/client/stdio.js');
-    
-    const transport = new StdioClientTransport({
-      command: 'npx',
-      args: ['-y', '@makenotion/notion-mcp-server'],
-      env: {
-        ...process.env,
-        NOTION_TOKEN: process.env.NOTION_API_KEY
-      }
-    });
-    
-    mcpClient = new Client({
-      name: "omi-notion-integration",
-      version: "1.0.0"
-    }, {
-      capabilities: {}
-    });
-
-    await mcpClient.connect(transport);
-    console.log('✅ Connected to Notion MCP server');
-    return mcpClient;
-  } catch (error) {
-    console.error('❌ Failed to connect to MCP server:', error);
-    throw error;
-  }
-}
+// Initialize Notion client
+const notion = new Client({
+  auth: process.env.NOTION_API_KEY,
+});
 
 async function addTaskToNotion(taskDescription, memory) {
-  const client = await initializeMCP();
   
   // Get property mappings from environment variables (customized for user's database)
   const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Task Name';
@@ -93,16 +64,13 @@ async function addTaskToNotion(taskDescription, memory) {
   // Due date property (if exists) - leave empty, user can set manually
   // Note: Not auto-setting due date since Omi AI doesn't provide specific dates
   
-  // Create a new page in the Tasks database
-  const result = await client.callTool({
-    name: 'create_page',
-    arguments: {
-      parent: {
-        type: 'database_id',
-        database_id: process.env.NOTION_TASKS_DATABASE_ID
-      },
-      properties: properties
-    }
+  // Create a new page in the Tasks database using Notion API
+  const result = await notion.pages.create({
+    parent: {
+      type: 'database_id',
+      database_id: process.env.NOTION_TASKS_DATABASE_ID
+    },
+    properties: properties
   });
   
   console.log(`✅ Added task to Notion: "${taskDescription}"`);
