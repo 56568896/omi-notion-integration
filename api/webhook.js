@@ -22,7 +22,7 @@ async function addTaskToNotion(taskDescription, memory) {
   }
   
   // Get property mappings from environment variables (customized for user's database)
-  const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Task Name';
+  const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Task name';
   const statusProperty = process.env.NOTION_STATUS_PROPERTY || 'Status';
   const sourceProperty = process.env.NOTION_SOURCE_PROPERTY || 'Project';
   const dateProperty = process.env.NOTION_DATE_PROPERTY || 'Due date';
@@ -30,6 +30,14 @@ async function addTaskToNotion(taskDescription, memory) {
   const defaultStatus = process.env.NOTION_DEFAULT_STATUS || 'To-do';
   const defaultWhen = process.env.NOTION_DEFAULT_WHEN || 'Today';
   const defaultProject = process.env.NOTION_DEFAULT_PROJECT || null;
+  
+  console.log('Using property names:', {
+    titleProperty,
+    statusProperty,
+    sourceProperty,
+    dateProperty,
+    whenProperty
+  });
   
   // Build properties object dynamically
   const properties = {};
