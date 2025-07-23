@@ -129,8 +129,14 @@ export default async function handler(req, res) {
     
     console.log(`📥 Received memory from user ${uid}:`, memory.structured?.title);
     
+    // Debug: Log the full payload structure
+    console.log('Full memory object:', JSON.stringify(memory, null, 2));
+    
     // Extract action items
     const actionItems = memory.structured?.action_items || [];
+    
+    console.log('Action items found:', actionItems.length);
+    console.log('Action items data:', JSON.stringify(actionItems, null, 2));
     
     if (actionItems.length === 0) {
       console.log('No action items found in this memory');
