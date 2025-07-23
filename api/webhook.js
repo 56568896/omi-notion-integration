@@ -45,10 +45,10 @@ async function addTaskToNotion(taskDescription, memory) {
     ]
   };
   
-  // Status property (if exists)
+  // Status property (if exists) - using correct format for Notion status type
   if (statusProperty) {
     properties[statusProperty] = {
-      select: {
+      status: {
         name: defaultStatus
       }
     };
