@@ -3,20 +3,5 @@
     "api/webhook.js": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "NOTION_API_KEY": "@notion_api_key",
-    "NOTION_TASKS_DATABASE_ID": "@notion_tasks_database_id",
-    "NOTION_TITLE_PROPERTY": "@notion_title_property",
-    "NOTION_STATUS_PROPERTY": "@notion_status_property", 
-    "NOTION_SOURCE_PROPERTY": "@notion_source_property",
-    "NOTION_DATE_PROPERTY": "@notion_date_property",
-    "NOTION_DEFAULT_STATUS": "@notion_default_status"
-  },
-  "build": {
-    "env": {
-      "NOTION_API_KEY": "@notion_api_key",
-      "NOTION_TASKS_DATABASE_ID": "@notion_tasks_database_id"
-    }
   }
 }
