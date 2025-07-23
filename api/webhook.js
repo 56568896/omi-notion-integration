@@ -121,7 +121,12 @@ export default async function handler(req, res) {
           await addTaskToNotion(item.description, memory);
           processedTasks.push(item.description);
         } catch (error) {
-          console.error(`Failed to add task "${item.description}":`, error);
+          console.error(`Failed to add task "${item.description}":`, error.message);
+          
+          // If it's a validation error, let's get more details
+          if (error.code === 'validation_error') {
+            console.error('Full validation error:', error.body);
+          }
         }
       }
     }
