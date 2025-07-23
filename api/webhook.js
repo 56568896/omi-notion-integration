@@ -10,6 +10,17 @@ const notion = new Client({
 
 async function addTaskToNotion(taskDescription, memory) {
   
+  // First, let's get the database schema to see the actual property names
+  try {
+    const databaseInfo = await notion.databases.retrieve({
+      database_id: process.env.NOTION_TASKS_DATABASE_ID
+    });
+    
+    console.log('Database properties:', JSON.stringify(databaseInfo.properties, null, 2));
+  } catch (error) {
+    console.error('Failed to get database info:', error.message);
+  }
+  
   // Get property mappings from environment variables (customized for user's database)
   const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Task Name';
   const statusProperty = process.env.NOTION_STATUS_PROPERTY || 'Status';
