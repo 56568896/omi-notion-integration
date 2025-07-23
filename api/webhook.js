@@ -36,12 +36,15 @@ async function initializeMCP() {
 async function addTaskToNotion(taskDescription, memory) {
   const client = await initializeMCP();
   
-  // Get property mappings from environment variables (with defaults)
-  const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Name';
+  // Get property mappings from environment variables (customized for user's database)
+  const titleProperty = process.env.NOTION_TITLE_PROPERTY || 'Task Name';
   const statusProperty = process.env.NOTION_STATUS_PROPERTY || 'Status';
-  const sourceProperty = process.env.NOTION_SOURCE_PROPERTY || 'Source';
-  const dateProperty = process.env.NOTION_DATE_PROPERTY || 'Created Date';
-  const defaultStatus = process.env.NOTION_DEFAULT_STATUS || 'Not started';
+  const sourceProperty = process.env.NOTION_SOURCE_PROPERTY || 'Project';
+  const dateProperty = process.env.NOTION_DATE_PROPERTY || 'Due date';
+  const whenProperty = process.env.NOTION_WHEN_PROPERTY || 'When';
+  const defaultStatus = process.env.NOTION_DEFAULT_STATUS || 'To-do';
+  const defaultWhen = process.env.NOTION_DEFAULT_WHEN || 'Today';
+  const defaultProject = process.env.NOTION_DEFAULT_PROJECT || null;
   
   // Build properties object dynamically
   const properties = {};
@@ -66,27 +69,26 @@ async function addTaskToNotion(taskDescription, memory) {
     };
   }
   
-  // Source property (if exists) 
-  if (sourceProperty) {
-    properties[sourceProperty] = {
-      rich_text: [
-        {
-          text: {
-            content: `From Omi AI: ${memory.structured?.title || 'Untitled conversation'}`
-          }
-        }
-      ]
-    };
-  }
-  
-  // Date property (if exists)
-  if (dateProperty) {
-    properties[dateProperty] = {
-      date: {
-        start: memory.created_at
+  // When property (if exists)
+  if (whenProperty) {
+    properties[whenProperty] = {
+      select: {
+        name: defaultWhen
       }
     };
   }
+  
+  // Project property (if exists and default is specified) 
+  if (sourceProperty && defaultProject) {
+    properties[sourceProperty] = {
+      select: {
+        name: defaultProject
+      }
+    };
+  }
+  
+  // Due date property (if exists) - leave empty, user can set manually
+  // Note: Not auto-setting due date since Omi AI doesn't provide specific dates
   
   // Create a new page in the Tasks database
   const result = await client.callTool({
