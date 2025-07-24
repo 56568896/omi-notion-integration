@@ -8,6 +8,36 @@ const notion = new Client({
   auth: process.env.NOTION_API_KEY,
 });
 
+// Send notification to Omi app
+async function sendOmiNotification(message, uid) {
+  if (!process.env.OMI_API_KEY || !uid) {
+    console.log('Skipping notification - missing API key or UID');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://based-hardware--plugins-api-plugins-api-send-notification.modal.run/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OMI_API_KEY}`
+      },
+      body: JSON.stringify({
+        uid: uid,
+        message: message
+      })
+    });
+
+    if (response.ok) {
+      console.log(`✅ Notification sent: "${message}"`);
+    } else {
+      console.error('Failed to send notification:', response.status, response.statusText);
+    }
+  } catch (error) {
+    console.error('Error sending notification:', error.message);
+  }
+}
+
 async function addTaskToNotion(taskDescription, memory) {
   
   // First, let's get the database schema to see the actual property names
@@ -139,8 +169,14 @@ export default async function handler(req, res) {
         try {
           await addTaskToNotion(item.description, memory);
           processedTasks.push(item.description);
+          
+          // Send confirmation notification
+          await sendOmiNotification(`✅ Task added: ${item.description}`, uid);
         } catch (error) {
           console.error(`Failed to add task "${item.description}":`, error.message);
+          
+          // Send error notification
+          await sendOmiNotification(`❌ Failed to add task: ${item.description}`, uid);
           
           // If it's a validation error, let's get more details
           if (error.code === 'validation_error') {
